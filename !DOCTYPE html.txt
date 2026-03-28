@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Study Planner | Cinematic Edition</title>
+    <style>
+        /* --- CSS STYLES --- */
+        :root {
+            --primary: #00d2ff;
+            --secondary: #9d50bb;
+            --bg: #0a0a0c;
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        section {
+            display: none; /* Hidden by default for navigation */
+            min-height: 100vh;
+            padding: 50px 20px;
+            box-sizing: border-box;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        #hero {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                        url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070');
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+        }
+
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 { font-size: 3rem; margin-bottom: 10px; color: var(--primary); }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: white;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--primary); }
+
+        .result-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .fail { border-left: 5px solid #ff4b2b; background: rgba(255, 75, 43, 0.1); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <section id="hero" style="display: flex;">
+        <h1>AI ACADEMIC PATH</h1>
+        <p>Optimize your learning with neural analysis.</p>
+        <button class="btn" onclick="nav('step-1')">Get Started</button>
+    </section>
+
+    <section id="step-1">
+        <div class="glass-card">
+            <h2>User Profile</h2>
+            <input type="email" placeholder="Email Address">
+            <input type="text" placeholder="Education Status (e.g. B.Tech)">
+            <input type="text" placeholder="College Name">
+            <input type="text" placeholder="College Address">
+            <select>
+                <option>Regulation R21</option>
+                <option>Regulation R23</option>
+            </select>
+            <button class="btn" onclick="nav('step-2')">Save & Continue</button>
+        </div>
+    </section>
+
+    <section id="step-2">
+        <div class="glass-card">
+            <h2>Semester Analysis</h2>
+            <p>Upload your mark sheet for AI categorization.</p>
+            <div style="border: 2px dashed var(--border); padding: 30px; margin: 20px 0; border-radius: 10px;">
+                Drag & Drop Marksheet Here
+            </div>
+            <button class="btn" onclick="simulateAI()">Run AI Analysis</button>
+            
+            <div id="ai-output" style="margin-top:20px;"></div>
+            
+            <button id="plan-btn" class="btn" style="display:none;" onclick="nav('step-3')">Get Planned</button>
+        </div>
+    </section>
+
+    <section id="step-3">
+        <div class="glass-card">
+            <h2>Smart Timetable</h2>
+            <input type="text" id="t-hours" placeholder="College Hours (e.g. 9-4)">
+            <input type="number" id="f-hours" placeholder="Available Free Hours">
+            <button class="btn" onclick="generatePlan()">Generate Study Plan</button>
+            <div id="final-plan" style="margin-top:20px; font-size: 0.9rem;"></div>
+        </div>
+    </section>
+
+    <script>
+        // NAVIGATION ENGINE
+        function nav(id) {
+            document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+            document.getElementById(id).style.display = 'flex';
+            if(id !== 'hero') document.getElementById(id).style.display = 'block';
+        }
+
+        // AI MOCK LOGIC (Sorting Marks)
+        function simulateAI() {
+            const output = document.getElementById('ai-output');
+            output.innerHTML = "<em>AI is analyzing marks...</em>";
+            
+            // Simulated Data
+            const subjects = [
+                { name: "Microprocessors", score: 32 },
+                { name: "VLSI Design", score: 85 },
+                { name: "Digital Signal Processing", score: 45 },
+                { name: "Control Systems", score: 38 }
+            ];
+
+            setTimeout(() => {
+                // Sort Low to High
+                subjects.sort((a, b) => a.score - b.score);
+                
+                output.innerHTML = "<h4>Categorized Results:</h4>";
+                subjects.forEach(s => {
+                    const isFail = s.score < 40;
+                    output.innerHTML += `
+                        <div class="result-item ${isFail ? 'fail' : ''}">
+                            <span>${s.name}</span>
+                            <span>${s.score}</span>
+                        </div>
+                    `;
+                });
+                document.getElementById('plan-btn').style.display = 'block';
+            }, 1500);
+        }
+
+        // TIMETABLE GENERATOR
+        function generatePlan() {
+            const free = document.getElementById('f-hours').value;
+            const output = document.getElementById('final-plan');
+            output.innerHTML = `
+                <div class="result-item" style="border-left: 5px solid var(--primary)">
+                    Plan: Allocate ${Math.floor(free * 0.6)} hours to your lowest scoring subjects first. 
+                    Unit-wise PYQs have been generated for Microprocessors.
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>                                                                                                                                                                How many actions are 
